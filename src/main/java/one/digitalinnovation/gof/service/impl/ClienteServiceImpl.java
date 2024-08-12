@@ -9,6 +9,7 @@ import one.digitalinnovation.gof.model.Cliente;
 import one.digitalinnovation.gof.model.ClienteRepository;
 import one.digitalinnovation.gof.model.Endereco;
 import one.digitalinnovation.gof.model.EnderecoRepository;
+import one.digitalinnovation.gof.service.ClienteObserver;
 import one.digitalinnovation.gof.service.ClienteService;
 import one.digitalinnovation.gof.service.ClienteSubject;
 import one.digitalinnovation.gof.service.ViaCepService;
@@ -29,10 +30,12 @@ public class ClienteServiceImpl extends ClienteSubject implements ClienteService
 	@Autowired
 	private EnderecoRepository enderecoRepository;
 	@Autowired
-	private ViaCepService viaCepService;
-	
-	// Observer: notificar alterações
-
+	private ViaCepService viaCepService;	
+	// Observer: registrar os observers
+    @Autowired
+    public ClienteServiceImpl(ClienteObserver clienteObserver) {
+        addObserver(clienteObserver);
+    }
 	
 	// Strategy: Implementar os métodos definidos na interface.
 	// Facade: Abstrair integrações com subsistemas, provendo uma interface simples.
