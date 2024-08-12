@@ -10,6 +10,7 @@ import one.digitalinnovation.gof.model.ClienteRepository;
 import one.digitalinnovation.gof.model.Endereco;
 import one.digitalinnovation.gof.model.EnderecoRepository;
 import one.digitalinnovation.gof.service.ClienteService;
+import one.digitalinnovation.gof.service.ClienteSubject;
 import one.digitalinnovation.gof.service.ViaCepService;
 
 /**
@@ -20,7 +21,7 @@ import one.digitalinnovation.gof.service.ViaCepService;
  * @author falvojr
  */
 @Service
-public class ClienteServiceImpl implements ClienteService {
+public class ClienteServiceImpl extends ClienteSubject implements ClienteService {
 
 	// Singleton: Injetar os componentes do Spring com @Autowired.
 	@Autowired
@@ -29,6 +30,9 @@ public class ClienteServiceImpl implements ClienteService {
 	private EnderecoRepository enderecoRepository;
 	@Autowired
 	private ViaCepService viaCepService;
+	
+	// Observer: notificar alterações
+
 	
 	// Strategy: Implementar os métodos definidos na interface.
 	// Facade: Abstrair integrações com subsistemas, provendo uma interface simples.
@@ -49,6 +53,7 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	public void inserir(Cliente cliente) {
 		salvarClienteComCep(cliente);
+		notifyObservers(cliente, "inserir");
 	}
 
 	@Override
@@ -57,13 +62,16 @@ public class ClienteServiceImpl implements ClienteService {
 		Optional<Cliente> clienteBd = clienteRepository.findById(id);
 		if (clienteBd.isPresent()) {
 			salvarClienteComCep(cliente);
+			notifyObservers(cliente, "atualizar");
 		}
 	}
 
 	@Override
 	public void deletar(Long id) {
 		// Deletar Cliente por ID.
+		Optional<Cliente> cliente = clienteRepository.findById(id);
 		clienteRepository.deleteById(id);
+		cliente.ifPresent(c -> notifyObservers(c, "deletar"));
 	}
 
 	private void salvarClienteComCep(Cliente cliente) {
